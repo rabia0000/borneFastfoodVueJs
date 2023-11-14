@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="style.css">
+        <title>Self Service Order</title>
+    </head>
+
+    <body>
+        
+        <main id="app">
+            <!-- utilisation d'une boucle pour rentrer nos données dynamiquement -->
+            <!-- utilisation de DIRECTIVE c'est un attribut special que nous allons ajouté a nos elements HTML ce qui nous permet d'ajouter de la logique a l'interieur du html -->
+            
+            <!-- :class="product.active ? 'selected' : ''" pour selectionner un article a la place de  
+                :class="{selected : product.active}"-->
+            <section class="items">
+                <!-- <h4>{{message}}</h4> -->
+                <h4>Pick Your Items</h4>
+                <div 
+                v-for ="product in products" 
+                class="product"
+                @click="product.active = !product.active"
+                :class="{selected : product.active}"
+
+                
+                >
+                
+                    <div class="photo">
+                        <!-- probleme d'affichage avec les images, quand nous sommes a l'interieur d'un attribut "src" -->
+                        <!-- product.photo directement mais vue js ne sais pas si c'est une chaine de car ou si nous passons
+                        des données dynamique pour dire a vue js que c'est des donnée dyn on ajoute : avant l'attribut src -->
+                        <!-- <img src= {{product.photo}}> -->
+                        <img v-bind:src= product.photo>
+                    </div>
+                    <div class="description">
+                        <span class="name">{{product.name}}</span>
+                        <span class="price">{{product.price}}</span>
+                        <!-- affiche la quantité uniquement si le produit est actif  -->
+                        <div class="quantity-areab" v-if="product.active">
+                            <!-- lorsque nous cliquons sur  - ou + cela selectionne ou deselectionne l'article 
+                            ce qui est problatique. il nous faut donc un arret de propagation
+                        (aller sur Event modifiers dans la doc) on va donc ajouter .stop a l'element enfant -->
+                        <!-- pour le bouton - nous voulons qu'il soit actif uniquement si la quantité est supérieur a 1  -->
+                            <button @click.stop="product.quantity--" :disabled="product.quantity <= 1 ">-</button>
+                            <span class="quantity">{{product.quantity}}</span>
+                            <button @click.stop="product.quantity++">+</button>
+                        </div>
+                    </div>
+                </div>
+               
+
+            <section class="summary" v-if="total()>0">
+                <strong>Order Details</strong>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- on utilise template lorsque qu'on veut qu'un element ne soit pas chargé au debut  -->
+                        
+            
+                        <tr v-for="product in products">
+                            <template v-if="product.active" >
+
+                                <td>{{product.quantity + 'x' + product.name}}</td>
+                                <td>{{(product.quantity * product.price).toFixed(2) }}</td>
+
+                            </template>
+                        </tr>
+                        
+                        <tr>
+                            <th>Total</th>
+                            <th>{{total()}}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+        </main>
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script src="scripts.js"></script>
+    </body>
+
+</html>
